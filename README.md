@@ -90,10 +90,11 @@ Reattach reverses the process: the detached window is closed (renderer process e
 Place one or more video files (.mp4/.avi/.mkv/.mov) in `media/source/`, then run:
 
 ```bash
-bash start.sh
+bash start.sh        # default: 12 streams
+bash start.sh 20     # or any number
 ```
 
-This will transcode source files into 12 HLS streams (if not already done) and start the server.
+This will transcode source files into HLS streams (if not already done) and start the server.
 
 ### 2. Launch the Electron app
 
@@ -105,9 +106,10 @@ npm start
 
 ### Controls
 
-- **+/−** buttons in the header: add/remove video streams (1–12)
+- **+/−** buttons in the header: add/remove video streams (no hard limit, default 12)
 - **⬈** on each tile: detach video to a separate window
 - **⬋** or close the window: return video to the main grid
+- **Detach All**: pop out all videos at once, tiled neatly across the screen
 - **Metrics** button: toggle detailed per-process performance overlay
 - **Status bar** (bottom): always-on CPU, memory, dropped frames summary
 
@@ -142,7 +144,7 @@ sudo powermetrics --samplers gpu_power -i 2000 -n 5
 │       ├── index.html    # Main room layout
 │       ├── styles.css    # All styles (main + detached windows)
 │       ├── app.js        # Room logic — grid, +/−, detach/reattach
-│       ├── hls-player.js # hls.js wrapper with stall detection
+│       ├── hls-player.js # hls.js wrapper
 │       ├── metrics.js    # Performance collector (status bar + overlay)
 │       ├── detached.html # Detached video window
 │       └── detached.js   # Detached window logic
