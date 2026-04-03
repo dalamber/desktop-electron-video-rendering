@@ -11,6 +11,7 @@ const btnMetrics = document.getElementById('btn-metrics');
 const btnCloseMetrics = document.getElementById('btn-close-metrics');
 const btnAddStream = document.getElementById('btn-add-stream');
 const btnRemoveStream = document.getElementById('btn-remove-stream');
+const btnDetachAll = document.getElementById('btn-detach-all');
 const participantCountEl = document.getElementById('participant-count');
 const memberCountEl = document.getElementById('member-count');
 const memberListEl = document.getElementById('member-list');
@@ -59,6 +60,7 @@ function setupEventListeners() {
 
   btnAddStream.addEventListener('click', () => addStream());
   btnRemoveStream.addEventListener('click', () => removeStream());
+  btnDetachAll.addEventListener('click', () => detachAllVideos());
 }
 
 // ── Stream loading ──────────────────────────────────────────────
@@ -133,6 +135,66 @@ function removeStream() {
 function updateGridLayout(count) {
   videoGrid.className = '';
   videoGrid.classList.add(`grid-${Math.min(count, 12)}`);
+}
+
+// ── Detach all ──────────────────────────────────────────────────
+
+async function detachAllVideos() {
+  // Collect all attached streams
+  const toDetach = activeStreamIds
+    .filter(id => !detachedStreams.has(id))
+    .map(id => streams.find(s => s.id === id))
+    .filter(Boolean);
+
+  if (toDetach.length === 0) return;
+
+  // Destroy all players in main window first
+  for (const stream of toDetach) {
+    const entry = players.get(stream.id);
+    if (entry) {
+      entry.player.destroy();
+      metricsCollector.unregisterPlayer(stream.id);
+
+      // Turn tile into placeholder
+      const tile = entry.tile;
+      tile.classList.add('detached');
+      tile.innerHTML = '';
+
+      const label = document.createElement('div');
+      label.className = 'detached-label';
+      label.textContent = `${stream.name}\n(detached)`;
+
+      const overlay = document.createElement('div');
+      overlay.className = 'tile-overlay';
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'tile-name';
+      nameSpan.textContent = stream.name;
+
+      const returnBtn = document.createElement('button');
+      returnBtn.className = 'tile-btn';
+      returnBtn.title = 'Return to room';
+      returnBtn.innerHTML = '\u2B8B';
+      returnBtn.addEventListener('click', () => reattachVideo(stream));
+
+      overlay.appendChild(nameSpan);
+      overlay.appendChild(returnBtn);
+      tile.appendChild(label);
+      tile.appendChild(overlay);
+
+      detachedStreams.add(stream.id);
+      players.delete(stream.id);
+    }
+  }
+
+  // Ask main process to create all windows tiled across the screen
+  const streamList = toDetach.map(s => ({
+    streamId: s.id,
+    streamName: s.name,
+    streamUrl: s.url
+  }));
+
+  await window.electronAPI.detachAll(streamList);
 }
 
 // ── Video tile ──────────────────────────────────────────────────

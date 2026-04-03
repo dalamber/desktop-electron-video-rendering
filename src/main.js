@@ -38,15 +38,15 @@ function createMainWindow() {
   });
 }
 
-function createDetachedWindow(streamId, streamName, streamUrl) {
+function createDetachedWindow(streamId, streamName, streamUrl, bounds = null) {
   if (detachedWindows.has(streamId)) {
     detachedWindows.get(streamId).focus();
     return;
   }
 
-  const win = new BrowserWindow({
-    width: 640,
-    height: 520,
+  const winOpts = {
+    width: bounds ? bounds.width : 640,
+    height: bounds ? bounds.height : 520,
     minWidth: 320,
     minHeight: 280,
     title: streamName,
@@ -56,7 +56,14 @@ function createDetachedWindow(streamId, streamName, streamUrl) {
       nodeIntegration: false,
       backgroundThrottling: false
     }
-  });
+  };
+
+  if (bounds) {
+    winOpts.x = bounds.x;
+    winOpts.y = bounds.y;
+  }
+
+  const win = new BrowserWindow(winOpts);
 
   const params = new URLSearchParams({ streamId, streamName, streamUrl });
   win.loadFile(path.join(__dirname, 'renderer', 'detached.html'), { query: Object.fromEntries(params) });
@@ -73,8 +80,34 @@ function createDetachedWindow(streamId, streamName, streamUrl) {
 }
 
 // IPC Handlers
-ipcMain.handle('detach-video', (event, { streamId, streamName, streamUrl }) => {
-  createDetachedWindow(streamId, streamName, streamUrl);
+ipcMain.handle('detach-video', (event, { streamId, streamName, streamUrl, bounds }) => {
+  createDetachedWindow(streamId, streamName, streamUrl, bounds || null);
+  return true;
+});
+
+ipcMain.handle('detach-all', (event, streamList) => {
+  const { screen } = require('electron');
+  const display = screen.getPrimaryDisplay();
+  const { width: screenW, height: screenH } = display.workAreaSize;
+  const { x: originX, y: originY } = display.workArea;
+
+  const count = streamList.length;
+  const cols = Math.ceil(Math.sqrt(count));
+  const rows = Math.ceil(count / cols);
+  const gap = 4;
+  const winW = Math.floor((screenW - gap * (cols + 1)) / cols);
+  const winH = Math.floor((screenH - gap * (rows + 1)) / rows);
+
+  for (let i = 0; i < count; i++) {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const x = originX + gap + col * (winW + gap);
+    const y = originY + gap + row * (winH + gap);
+
+    const s = streamList[i];
+    createDetachedWindow(s.streamId, s.streamName, s.streamUrl, { x, y, width: winW, height: winH });
+  }
+
   return true;
 });
 

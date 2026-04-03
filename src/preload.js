@@ -2,6 +2,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
   detachVideo: (data) => ipcRenderer.invoke('detach-video', data),
+  detachAll: (streamList) => ipcRenderer.invoke('detach-all', streamList),
   reattachVideo: (streamId) => ipcRenderer.invoke('reattach-video', streamId),
   getMetrics: () => ipcRenderer.invoke('get-metrics'),
   getGpuInfo: () => ipcRenderer.invoke('get-gpu-info'),
