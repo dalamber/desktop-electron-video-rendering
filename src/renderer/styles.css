@@ -178,6 +178,7 @@ body {
 #video-grid.grid-10,
 #video-grid.grid-11,
 #video-grid.grid-12 { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); }
+/* 12+ just keeps 4-column layout, rows grow automatically */
 
 /* Video Tile */
 .video-tile {

@@ -6,7 +6,7 @@ ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SOURCE_DIR="$ROOT_DIR/media/source"
 OUTPUT_DIR="$ROOT_DIR/media/streams"
 SERVER_DIR="$ROOT_DIR/server"
-MAX_STREAMS=12
+MAX_STREAMS=${1:-12}
 
 # ── Check dependencies ──────────────────────────────────────────
 for cmd in node ffmpeg ffprobe; do
