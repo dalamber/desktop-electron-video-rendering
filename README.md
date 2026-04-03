@@ -2,6 +2,8 @@
 
 Engineering prototype of a desktop video room client built on Electron. Tests the viability of a web/Electron approach for simultaneous multi-stream video rendering with pop-out (detached) windows.
 
+![Demo](demo.gif)
+
 ## How the Rendering Pipeline Works
 
 ### Architecture Overview
