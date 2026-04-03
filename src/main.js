@@ -3,6 +3,9 @@ const path = require('path');
 
 // Disable autoplay restrictions — critical for multiple simultaneous videos
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+// Prevent Chromium from throttling/pausing media in background windows
+app.commandLine.appendSwitch('disable-renderer-backgrounding');
+app.commandLine.appendSwitch('disable-background-timer-throttling');
 
 const detachedWindows = new Map(); // streamId -> BrowserWindow
 
@@ -18,7 +21,8 @@ function createMainWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      backgroundThrottling: false
     }
   });
 
@@ -49,7 +53,8 @@ function createDetachedWindow(streamId, streamName, streamUrl) {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      backgroundThrottling: false
     }
   });
 

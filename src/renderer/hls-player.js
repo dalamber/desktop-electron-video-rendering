@@ -1,5 +1,5 @@
 /**
- * HLS Player wrapper using hls.js
+ * HLS Player wrapper using hls.js — keep it simple
  */
 
 class HLSPlayer {
@@ -8,7 +8,6 @@ class HLSPlayer {
     this.url = streamUrl;
     this.hls = null;
     this._destroyed = false;
-    this._stallCheckInterval = null;
   }
 
   async init() {
@@ -16,58 +15,30 @@ class HLSPlayer {
 
     if (window.Hls && window.Hls.isSupported()) {
       this.hls = new window.Hls({
-        enableWorker: false, // avoid worker contention with many instances
+        enableWorker: false,
         lowLatencyMode: false,
-        maxBufferLength: 10,
-        maxMaxBufferLength: 30,
-        startFragPrefetch: true
+        maxBufferLength: 30,
+        maxMaxBufferLength: 60,
       });
 
       this.hls.loadSource(this.url);
       this.hls.attachMedia(this.video);
 
       this.hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
-        this._tryPlay();
+        this.video.muted = true;
+        this.video.play().catch(() => {});
       });
 
       this.hls.on(window.Hls.Events.ERROR, (event, data) => {
         if (data.fatal) {
-          console.warn(`HLS fatal error for ${this.url}:`, data.type, data.details);
           if (data.type === window.Hls.ErrorTypes.MEDIA_ERROR) {
             this.hls.recoverMediaError();
           } else if (data.type === window.Hls.ErrorTypes.NETWORK_ERROR) {
-            // Retry after brief delay
             setTimeout(() => {
-              if (!this._destroyed && this.hls) {
-                this.hls.startLoad();
-              }
+              if (!this._destroyed && this.hls) this.hls.startLoad();
             }, 2000);
           }
         }
-      });
-
-      // Watch for stalls — if video is paused/stuck after 3s, nudge it
-      this._stallCheckInterval = setInterval(() => {
-        if (this._destroyed) return;
-        if (this.video && this.video.paused && this.video.readyState >= 2) {
-          console.log(`Nudging stalled video: ${this.url}`);
-          this._tryPlay();
-        }
-      }, 3000);
-
-    } else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {
-      this.video.src = this.url;
-      this._tryPlay();
-    }
-  }
-
-  _tryPlay() {
-    if (!this.video || this._destroyed) return;
-    this.video.muted = true;
-    const p = this.video.play();
-    if (p && p.catch) {
-      p.catch(err => {
-        console.warn(`Play failed for ${this.url}:`, err.message);
       });
     }
   }
@@ -81,10 +52,6 @@ class HLSPlayer {
 
   destroy() {
     this._destroyed = true;
-    if (this._stallCheckInterval) {
-      clearInterval(this._stallCheckInterval);
-      this._stallCheckInterval = null;
-    }
     if (this.hls) {
       this.hls.destroy();
       this.hls = null;

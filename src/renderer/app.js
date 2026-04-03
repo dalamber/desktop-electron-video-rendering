@@ -75,9 +75,12 @@ async function loadStreams() {
 
   const initialStreams = streams.slice(0, DEFAULT_STREAM_COUNT);
 
-  for (const stream of initialStreams) {
-    createVideoTile(stream);
+  // Stagger init — start each player 500ms apart to avoid resource contention
+  for (let i = 0; i < initialStreams.length; i++) {
+    const stream = initialStreams[i];
     activeStreamIds.push(stream.id);
+    if (i > 0) await new Promise(r => setTimeout(r, 500));
+    createVideoTile(stream);
   }
 
   updateUI();
