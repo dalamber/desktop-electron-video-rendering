@@ -1,0 +1,14 @@
+{
+  "name": "electron-room-video-prototype",
+  "version": "1.0.0",
+  "description": "Electron prototype for multi-window video room client",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "server": "bash start.sh",
+    "prepare-hls": "bash start.sh"
+  },
+  "dependencies": {
+    "electron": "^28.1.0"
+  }
+}

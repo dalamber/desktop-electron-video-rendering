@@ -1,0 +1,5 @@
+node_modules/
+media/streams/
+media/source/*
+dist/
+.DS_Store

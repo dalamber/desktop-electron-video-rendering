@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; media-src http://localhost:3001 blob:; connect-src http://localhost:3001;">
+  <title>Detached Video</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="detached-body">
+  <div class="detached-container">
+    <video id="video" autoplay playsinline muted></video>
+    <div class="detached-controls">
+      <span id="stream-name" class="detached-name"></span>
+      <button id="btn-return" class="return-btn">&#x2B8B; Return to Room</button>
+    </div>
+  </div>
+
+  <script src="vendor/hls.min.js"></script>
+  <script src="hls-player.js"></script>
+  <script src="detached.js"></script>
+</body>
+</html>

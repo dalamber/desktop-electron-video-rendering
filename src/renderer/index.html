@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; media-src http://localhost:3001 blob:; connect-src http://localhost:3001;">
+  <title>Video Room Prototype</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header id="header">
+      <div class="header-left">
+        <span class="room-icon">&#9679;</span>
+        <span class="room-title">Internationals Meet New Friends</span>
+        <span class="room-badge online">Online</span>
+      </div>
+      <div class="header-right">
+        <div class="stream-controls">
+          <button id="btn-remove-stream" class="header-btn" title="Remove a video">-</button>
+          <span id="participant-count" class="participant-count">0</span>
+          <button id="btn-add-stream" class="header-btn" title="Add a video">+</button>
+        </div>
+        <button id="btn-metrics" class="header-btn" title="Toggle Metrics Panel">Metrics</button>
+      </div>
+    </header>
+
+    <div id="main-layout">
+      <!-- Left Sidebar -->
+      <aside id="sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-header">Active Rooms</div>
+          <div class="room-item active">
+            <span class="room-dot online"></span>
+            Internationals Meet New...
+            <span class="room-count">12</span>
+          </div>
+          <div class="room-item">
+            <span class="room-dot"></span>
+            Music Lovers
+            <span class="room-count">5</span>
+          </div>
+          <div class="room-item">
+            <span class="room-dot"></span>
+            Tech Talk
+            <span class="room-count">3</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Video Grid -->
+      <main id="video-area">
+        <div id="video-grid"></div>
+      </main>
+
+      <!-- Right Panel -->
+      <aside id="right-panel">
+        <!-- Chat -->
+        <div id="chat-panel">
+          <div class="panel-header">Talking Now</div>
+          <div id="chat-messages"></div>
+          <div id="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Write a message..." disabled>
+          </div>
+        </div>
+        <!-- Member List -->
+        <div id="member-panel">
+          <div class="panel-header">Members <span id="member-count"></span></div>
+          <div id="member-list"></div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Status Bar (always visible) -->
+    <footer id="status-bar">
+      <span id="sb-cpu">CPU: --</span>
+      <span id="sb-mem">Mem: --</span>
+      <span id="sb-gpu">GPU: --</span>
+      <span id="sb-fps">Dropped: --</span>
+      <span id="sb-windows">Windows: 1</span>
+    </footer>
+
+    <!-- Metrics Overlay (detailed) -->
+    <div id="metrics-overlay" class="hidden">
+      <div class="metrics-header">
+        Performance Metrics
+        <button id="btn-close-metrics" class="close-btn">&times;</button>
+      </div>
+      <div id="metrics-content"></div>
+    </div>
+  </div>
+
+  <script src="vendor/hls.min.js"></script>
+  <script src="hls-player.js"></script>
+  <script src="metrics.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
